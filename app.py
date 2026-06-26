@@ -9,7 +9,10 @@ st.set_page_config(
 
 st.title("🚛 Painel de KM Morto - Biomata")
 
-arquivo = st.file_uploader("Envie o relatório de macros da Maxtrack", type=["xlsx"])
+arquivo = st.file_uploader(
+    "Envie o relatório de macros da Maxtrack",
+    type=["xlsx"]
+)
 
 if arquivo:
     df = pd.read_excel(arquivo)
@@ -17,15 +20,12 @@ if arquivo:
     st.subheader("Prévia do relatório")
     st.dataframe(df.head())
 
-    st.write("Colunas encontradas:")
+    st.subheader("Colunas encontradas")
     st.write(df.columns.tolist())
 
-    # Ajuste esses nomes conforme o relatório
     coluna_referencia = "Referência"
     coluna_macro = "Macro"
     coluna_frota = "Frota"
-    coluna_motorista = "Motorista"
-    coluna_km = "Km"
 
     df[coluna_referencia] = df[coluna_referencia].astype(str).str.upper()
     df[coluna_macro] = df[coluna_macro].astype(str).str.upper()
@@ -45,19 +45,14 @@ if arquivo:
 
     df_km = df[df["Tipo KM Morto"] != "Não conta"].copy()
 
-    st.subheader("Eventos considerados KM morto")
-    st.dataframe(df_km)
-
     col1, col2, col3 = st.columns(3)
 
-    with col1:
-        st.metric("Eventos KM morto", len(df_km))
+    col1.metric("Eventos KM morto", len(df_km))
+    col2.metric("Troca em Mandaçaia", len(df_km[df_km["Tipo KM Morto"] == "Troca em Mandaçaia"]))
+    col3.metric("Retorno Garagem BBM", len(df_km[df_km["Tipo KM Morto"] == "Retorno Garagem BBM"]))
 
-    with col2:
-        st.metric("Mandaçaia", len(df_km[df_km["Tipo KM Morto"] == "Troca em Mandaçaia"]))
-
-    with col3:
-        st.metric("Garagem BBM", len(df_km[df_km["Tipo KM Morto"] == "Retorno Garagem BBM"]))
+    st.subheader("Eventos considerados KM morto")
+    st.dataframe(df_km)
 
     st.subheader("Ranking por frota")
 
